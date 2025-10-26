@@ -1,0 +1,246 @@
+
+---- Objetivo: Criar tabelas, inserir dados e realizar consultas
+
+
+--AULA 01
+
+--Criando a tabela carro com as colunas marca, modelo e ano
+CREATE TABLE carro (
+	marca VARCHAR(255),
+	modelo VARCHAR(255),
+	ano INT
+);
+
+--Inserindo dados na tabela
+INSERT INTO carro (marca, modelo, ano)
+VALUES ('Fiat', 'Cronos', 2025);
+
+--Visualizando os dados da tabela
+SELECT * from carro;
+
+--Visualizar uma ou mais colunas
+SELECT modelo, ano from carro;
+
+--Adicionando uma nova coluna
+ALTER TABLE carro ADD cor VARCHAR(20);
+
+--Conferir se a coluna foi adicionada
+SELECT * from carro;
+
+
+--Inserindo várias linhas ao mesmo tempo na tabela
+INSERT INTO carro (marca, modelo, ano, cor)
+VALUES
+('Fiat', 'Pulse', 2025, 'vermelho'),
+('Fiat', 'Uno', 2020, 'verde'),
+('Volkswagen', 'T-Cross', 2023, 'Bege Mohave'),
+('Volkswagen', 'Taos', 2024, 'Azul Atlantic');
+
+--Conferir se as 4 linhas foram adicionadas
+SELECT * from carro;
+
+--Selecionado com condição
+SELECT * FROM carro WHERE marca = 'Fiat'
+
+--selecionando com condição sem diferenciar maiúscula e minúuscula
+SELECT * FROM carro WHERE marca ilike 'FIAT'
+
+
+--AULA 02
+
+-- Criando tabela com a Chave Primária
+CREATE TABLE cliente (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(255),
+	email VARCHAR(255)
+);
+
+INSERT INTO cliente (nome, email) VALUES
+('João Silva', 'joao@email.com'),
+('Maria Souza', 'maria@email.com');
+
+SELECT * FROM cliente
+
+
+INSERT INTO cliente (nome, email) VALUES
+('Felipe Farias', 'felipe@email.com');
+
+-- Atualizar a linha com o id 3 que está com o nome null
+UPDATE public.cliente SET nome='Teresa Divina' WHERE id=3;
+
+
+--Setar NOT NULL (não permitir valor nulo) coluna nome e email
+ALTER TABLE public.cliente
+    ALTER COLUMN nome SET NOT NULL,
+    ALTER COLUMN email SET NOT NULL;
+
+INSERT INTO cliente (id, nome, email) VALUES
+(4, 'Jorge Luucas', 'jlucas@email.com');
+
+--Ordenando por coluna, se não especificar o order o padrão é o ASC (do menor para o maior)
+SELECT * FROM cliente
+Order by id --ASC
+
+--Ordenar do maior para o menor
+SELECT * FROM cliente 
+Order by id DESC
+
+CREATE TABLE carro (
+	marca VARCHAR(255),
+	modelo VARCHAR(255),
+	ano INT
+);
+
+INSERT INTO carro (marca, modelo, ano)
+VALUES ('Fiat', 'Cronos', 2025);
+
+SELECT * from carro;
+
+--Criando tabela de realcionamento tipo_carro com carro
+CREATE TABLE IF NOT EXISTS tipo_carro
+(
+	id SERIAL PRIMARY KEY,
+    tipo character varying(255) NOT NULL
+)
+
+--Inserindo valores na tipo_carro
+INSERT INTO tipo_carro (tipo)
+VALUES 
+('SUV'),
+('Hatch'),
+('Sedan'),
+('Pickup'),
+('Crossover'),
+('Conversível'),
+('Cupê'),
+('Minivan');
+
+-- 🔹 EXERCÍCIO 1 A 4 - BANCO DE DADOS -- 
+
+
+--Select    
+SELECT * from tipo_carro
+
+
+-- Adicionar coluna id se ainda não existir
+ALTER TABLE public.carro
+    ADD COLUMN IF NOT EXISTS id SERIAL PRIMARY KEY;
+
+
+Select id,marca, modelo, ano from carro	
+
+-- Adicionar coluna id_tipo_carro (referência para tipo_carro)
+ALTER TABLE public.carro
+    ADD COLUMN IF NOT EXISTS id_tipo_carro INTEGER;
+
+
+Select * from carro	
+
+
+-- Criar a constraint de chave estrangeira
+ALTER TABLE public.carro
+    ADD CONSTRAINT fk_tipo_carro
+    FOREIGN KEY (id_tipo_carro)
+    REFERENCES public.tipo_carro (id);
+
+
+--Inserindo com relacionamentos
+INSERT INTO public.carro (marca, modelo, ano, id_tipo_carro)
+VALUES ('Jeep', 'Compass', 2025, 1),
+       ('Volkswagen', 'Gol', 2023, 2);
+-- 1️⃣ Criar tabela tipo_carro
+CREATE TABLE tipo_carro (
+    id SERIAL PRIMARY KEY,
+    tipo VARCHAR(100) NOT NULL
+);
+
+-- Inserir tipos de carro
+INSERT INTO tipo_carro (tipo)
+VALUES
+('SUV'),
+('Hatch'),
+('Sedan'),
+('Pickup'),
+('Crossover'),
+('Conversível'),
+('Cupê'),
+('Minivan');
+
+-- Tipo 99 (para teste de LEFT JOIN)
+INSERT INTO tipo_carro (id, tipo) VALUES (99, 'Fantasma');
+
+-- 2️⃣ Criar tabela pessoa
+CREATE TABLE pessoa (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(11) UNIQUE NOT NULL,
+    idade INT
+);
+
+-- 3️⃣ Criar tabela carro
+CREATE TABLE carro (
+    id SERIAL PRIMARY KEY,
+    tipo_id INT REFERENCES tipo_carro(id),
+    pessoa_id INT REFERENCES pessoa(id),
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    ano INT,
+    cor VARCHAR(50),
+    chassi VARCHAR(20) UNIQUE
+);
+
+-- 4️⃣ Inserir dados
+INSERT INTO carro (tipo_id, marca, modelo, ano, cor, chassi)
+VALUES
+(1, 'Toyota', 'RAV4', 2021, 'Preto', '9BWZZZ377VT004251'),
+(1, 'Honda', 'CR-V', 2022, 'Branco', '8ABZZZ123YT992311'),
+(2, 'Volkswagen', 'Golf', 2020, 'Prata', '1HGCM82633A123456'),
+(2, 'Ford', 'Fiesta', 2019, 'Azul', '3N1BC13E88L999999'),
+(3, 'Chevrolet', 'Onix Plus', 2023, 'Cinza', '2C3KA63H76H789012'),
+(3, 'Hyundai', 'Elantra', 2021, 'Vermelho', '1HGFA16526L007890'),
+(4, 'Ford', 'Ranger', 2020, 'Branco', '1FTRW12W47KB34567'),
+(99, 'Marca Fantasma', 'Modelo X', 2025, 'Transparente', 'XXXXXXXXXXXXXXX');
+
+-- Para saber qual o id_tipo_carro carro será, no exemplo acima 1 (SUV)
+select * from tipo_carro 
+
+--conferir o insert
+select * from carro
+
+------------- JOIN -------------
+
+--JOIN sem alias (apelido) 
+SELECT 
+	* 
+FROM
+	carro 
+JOIN tipo_carro  ON carro.id_tipo_carro = tipo_carro.id
+
+--JOIN com alias (apelido) 
+SELECT 
+	c.modelo, tc.tipo, c.chassi
+FROM
+	carro c
+JOIN tipo_carro tc ON c.id_tipo_carro = tc.id
+
+------------- JOIN, WHERE, LIKE e ILIKE -------------
+
+
+--Pegar todos os SUVs e da cor Branco
+SELECT 
+	c.modelo, tc.tipo, c.chassi, c.cor
+FROM
+	carro c
+JOIN tipo_carro tc ON c.id_tipo_carro = tc.id
+where c.cor = 'Branco'
+and c.id_tipo_carro = 1
+and tc.id = 1
+
+--pegar os carros que no chassi contenha 'zzz' em qualquer parte do chassi
+select * from carro c
+--where chassi ilike '%zzz%'
+where chassi ilike '8ab%' --o chassi inicia om 8ab
+
+--like (case sensitive)
+
+--ilike (case insensitive)
