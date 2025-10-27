@@ -143,12 +143,13 @@ ALTER TABLE public.carro
     FOREIGN KEY (id_tipo_carro)
     REFERENCES public.tipo_carro (id);
 
-
 --Inserindo com relacionamentos
+-- 1️⃣ Criar tabela tipo_carro
+
 INSERT INTO public.carro (marca, modelo, ano, id_tipo_carro)
 VALUES ('Jeep', 'Compass', 2025, 1),
        ('Volkswagen', 'Gol', 2023, 2);
--- 1️⃣ Criar tabela tipo_carro
+       
 CREATE TABLE tipo_carro (
     id SERIAL PRIMARY KEY,
     tipo VARCHAR(100) NOT NULL
